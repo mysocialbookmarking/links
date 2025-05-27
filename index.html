@@ -3,50 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bookmarking App</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <title>Social Bookmarking Site</title>
   <style>
-    body { font-family: 'Inter', sans-serif; background: #f4f4f9; margin: 0; padding: 0; }
-    header { background: #005bbb; color: #fff; padding: 20px; text-align: center; }
-    nav { background: #003f7d; padding: 10px; text-align: center; }
-    nav a { color: #fff; text-decoration: none; margin: 0 10px; font-weight: 600; }
-    .container { max-width: 900px; margin: 20px auto; padding: 20px; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    form input, form textarea, form button { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
-    .bookmark { border-bottom: 1px solid #ccc; padding: 10px 0; }
-    .bookmark a { color: #005bbb; font-weight: 600; }
-    .auth-section { text-align: right; margin: 10px 0; }
-    .auth-section input { width: auto; margin-right: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #005bbb;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    nav {
+      background-color: #004494;
+      color: white;
+      display: flex;
+      justify-content: center;
+      padding: 10px 0;
+    }
+    nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    form input, form textarea, form button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .bookmark {
+      border-bottom: 1px solid #ccc;
+      padding: 10px 0;
+    }
+    .bookmark a {
+      font-weight: bold;
+      color: #005bbb;
+      text-decoration: none;
+    }
+    .auth {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+    }
+    .auth input {
+      margin: 0 5px;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Social Bookmarking App</h1>
-    <p>
-      <a href="https://strhub.com/forum/topic/probo-referral-code-qp7x1m/" target="_blank" style="color:#fff; margin: 0 5px;">Probo Referral QP7X1M</a> |
-      <a href="https://strhub.com/forum/topic/what-is-the-referral-code-for-probo" target="_blank" style="color:#fff; margin: 0 5px;">Referral Code Info</a> |
-      <a href="https://strhub.com/forum/topic/what-is-the-referral-code-for-probo-probo-referral-code-is-qp7x1m" target="_blank" style="color:#fff; margin: 0 5px;">Referral Code Full Post</a>
-    </p>
+    <h1>Bookmark Manager</h1>
+    <p>Save and share your favorite links!</p>
   </header>
   <nav>
     <a href="#">Home</a>
-    <a href="#submit">Submit</a>
+    <a href="#submit">Submit Bookmark</a>
     <a href="#mybookmarks">My Bookmarks</a>
   </nav>
   <div class="container">
-    <div class="auth-section">
+    <div class="auth">
       <input type="text" id="username" placeholder="Username">
       <input type="password" id="password" placeholder="Password">
-      <button onclick="login()">Login</button>
       <button onclick="signup()">Signup</button>
+      <button onclick="login()">Login</button>
       <button onclick="logout()">Logout</button>
     </div>
 
-    <h2>Submit Bookmark</h2>
+    <h2>Submit a Bookmark</h2>
     <form id="bookmarkForm">
-      <input type="text" id="title" placeholder="Title" required>
-      <input type="url" id="url" placeholder="URL" required>
-      <textarea id="description" placeholder="Short Description" required></textarea>
-      <button type="submit">Submit</button>
+      <input type="text" id="title" placeholder="Bookmark Title" required>
+      <input type="url" id="url" placeholder="Bookmark URL" required>
+      <textarea id="description" placeholder="Short Description"></textarea>
+      <button type="submit">Save Bookmark</button>
     </form>
 
     <h2 id="mybookmarks">Your Bookmarks</h2>
@@ -54,56 +95,54 @@
   </div>
 
   <script>
-    const form = document.getElementById('bookmarkForm');
-    const bookmarksDiv = document.getElementById('bookmarks');
     let currentUser = null;
 
     function signup() {
       const user = document.getElementById('username').value;
       const pass = document.getElementById('password').value;
-      if (!user || !pass) return alert("Enter username and password");
-      if (localStorage.getItem(user)) return alert("User already exists");
+      if (!user || !pass) return alert("Please enter both username and password.");
+      if (localStorage.getItem(user)) return alert("User already exists.");
       localStorage.setItem(user, JSON.stringify({ password: pass, bookmarks: [] }));
-      alert("Signup successful! Now login.");
+      alert("Signup successful. Now log in.");
     }
 
     function login() {
       const user = document.getElementById('username').value;
       const pass = document.getElementById('password').value;
-      const stored = JSON.parse(localStorage.getItem(user));
-      if (!stored || stored.password !== pass) return alert("Invalid login");
+      const data = JSON.parse(localStorage.getItem(user));
+      if (!data || data.password !== pass) return alert("Invalid credentials.");
       currentUser = user;
-      alert("Login successful");
-      renderBookmarks();
+      alert("Login successful.");
+      loadBookmarks();
     }
 
     function logout() {
       currentUser = null;
-      bookmarksDiv.innerHTML = "";
-      alert("Logged out");
+      document.getElementById('bookmarks').innerHTML = "";
+      alert("Logged out.");
     }
 
-    function renderBookmarks() {
-      bookmarksDiv.innerHTML = "";
+    function loadBookmarks() {
+      const container = document.getElementById('bookmarks');
+      container.innerHTML = "";
       if (!currentUser) return;
-      const userData = JSON.parse(localStorage.getItem(currentUser));
-      userData.bookmarks.forEach(({ title, url, description }) => {
-        const html = `<div class="bookmark"><a href="${url}" target="_blank">${title}</a><p>${description}</p></div>`;
-        bookmarksDiv.innerHTML += html;
+      const data = JSON.parse(localStorage.getItem(currentUser));
+      data.bookmarks.forEach(b => {
+        container.innerHTML += `<div class='bookmark'><a href='${b.url}' target='_blank'>${b.title}</a><p>${b.description}</p></div>`;
       });
     }
 
-    form.addEventListener('submit', function(e) {
+    document.getElementById('bookmarkForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      if (!currentUser) return alert("Please login first");
+      if (!currentUser) return alert("Please login to submit a bookmark.");
       const title = document.getElementById('title').value;
       const url = document.getElementById('url').value;
       const description = document.getElementById('description').value;
       const userData = JSON.parse(localStorage.getItem(currentUser));
       userData.bookmarks.unshift({ title, url, description });
       localStorage.setItem(currentUser, JSON.stringify(userData));
-      renderBookmarks();
-      form.reset();
+      loadBookmarks();
+      e.target.reset();
     });
   </script>
 </body>
